@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gallery</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #0f1115;
+    color: #e8e9ec;
+    padding: 40px 20px;
+  }
+  h1 {
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 32px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .grid img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+  .grid img:hover { transform: scale(1.02); }
+
+  /* Lightbox */
+  #lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    cursor: zoom-out;
+  }
+  #lightbox img {
+    max-width: 90vw;
+    max-height: 90vh;
+    border-radius: 8px;
+  }
+  .empty {
+    text-align: center;
+    color: #8b8f9a;
+    margin-top: 60px;
+  }
+</style>
+</head>
+<body>
+
+  <h1>Galerie</h1>
+  <div class="grid" id="grid"></div>
+  <p class="empty" id="empty" style="display:none;">Keine Bilder gefunden.</p>
+
+  <div id="lightbox">
+    <img id="lightbox-img" src="" alt="">
+  </div>
+
+<script>
+  // Ordner, in dem die Bilder liegen (relativ zu dieser Seite)
+  const IMAGE_FOLDER = "images/";
+  // manifest.json enthält einfach eine Liste der Dateinamen, z. B.:
+  // ["foto1.jpg", "foto2.jpg", "foto3.png"]
+  const MANIFEST = IMAGE_FOLDER + "manifest.json";
+
+  const grid = document.getElementById("grid");
+  const empty = document.getElementById("empty");
+  const lightbox = document.getElementById("lightbox");
+  const lightboxImg = document.getElementById("lightbox-img");
+
+  fetch(MANIFEST)
+    .then(res => res.json())
+    .then(files => {
+      if (!files || files.length === 0) {
+        empty.style.display = "block";
+        return;
+      }
+      files.forEach(filename => {
+        const img = document.createElement("img");
+        img.src = IMAGE_FOLDER + filename;
+        img.loading = "lazy";
+        img.alt = filename;
+        img.addEventListener("click", () => {
+          lightboxImg.src = img.src;
+          lightbox.style.display = "flex";
+        });
+        grid.appendChild(img);
+      });
+    })
+    .catch(() => {
+      empty.textContent = "manifest.json nicht gefunden – siehe Kommentar im Quellcode.";
+      empty.style.display = "block";
+    });
+
+  lightbox.addEventListener("click", () => {
+    lightbox.style.display = "none";
+  });
+</script>
+
+</body>
+</html>
