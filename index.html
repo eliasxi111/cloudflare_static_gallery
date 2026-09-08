@@ -98,7 +98,7 @@
         empty.style.display = "block";
         return;
       }
-      loadSequentially(files);
+      loadSequentially(shuffle(files));
     })
     .catch(() => {
       empty.textContent = "manifest.json nicht gefunden – siehe Kommentar im Quellcode.";
@@ -133,6 +133,16 @@
       img.src = IMAGE_FOLDER + filename;
       grid.appendChild(img);
     });
+  }
+
+   // Fisher-Yates: mischt das Array in-place, unverfälschte Zufallsverteilung
+  function shuffle(array) {
+    const arr = array.slice(); // Kopie, damit das Original nicht mutiert wird
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
   }
 </script>
 
